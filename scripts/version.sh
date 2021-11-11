@@ -31,8 +31,8 @@ REVISION=$(git rev-parse HEAD)$(if ! git diff --no-ext-diff --quiet --exit-code;
 PLATFORM=${GOOS}-${GOARCH}
 RELEASE=${PROG}.${PLATFORM}
 # hardcode versions unless set specifically
-KUBERNETES_VERSION=${KUBERNETES_VERSION:-v1.22.3}
-KUBERNETES_IMAGE_TAG=${KUBERNETES_IMAGE_TAG:-v1.22.3-rke2r1-build20211028}
+KUBERNETES_VERSION=v1.22.3
+KUBERNETES_IMAGE_TAG=v1.22.3-rke2r1-build20211028
 ETCD_VERSION=${ETCD_VERSION:-v3.5.0-k3s2}
 PAUSE_VERSION=${PAUSE_VERSION:-3.5}
 CCM_VERSION=${CCM_VERSION:-v0.0.3-build20211020}
@@ -52,11 +52,11 @@ if [ -d .git ]; then
     fi
 fi
 
-if [[ -n "$GIT_TAG" ]]; then
-    VERSION=$GIT_TAG
-else
-    VERSION="${KUBERNETES_VERSION}-dev+${COMMIT:0:8}$DIRTY"
-fi
+#if [[ -n "$GIT_TAG" ]]; then
+#    VERSION=$GIT_TAG
+#else
+VERSION="${KUBERNETES_VERSION}+rke2r1"
+#fi
 
 if [[ "${VERSION}" =~ ^v([0-9]+)\.([0-9]+)(\.[0-9]+)?([-+].*)?$ ]]; then
     VERSION_MAJOR=${BASH_REMATCH[1]}
