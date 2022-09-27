@@ -1,3 +1,4 @@
+//go:build windows
 // +build windows
 
 package windows
@@ -10,7 +11,7 @@ import (
 
 const calicoConfigTemplate = `{
   "name": "{{ .CalicoConfig.Name }}",
-  "windows_use_single_network": true,
+  "windows_use_single_network": false,
   "cniVersion": "{{ .CalicoConfig.CNI.Version }}",
   "type": "calico",
   "mode": "{{ .CalicoConfig.Mode }}",
@@ -46,18 +47,9 @@ const calicoConfigTemplate = `{
     {
       "Name":  "EndpointPolicy",
       "Value":  {
-        "Type":  "OutBoundNAT",
-        "ExceptionList":  [
-          "{{ .CalicoConfig.ServiceCIDR }}"
-        ]
-      }
-    },
-    {
-      "Name":  "EndpointPolicy",
-      "Value":  {
         "Type":  "SDNROUTE",
         "DestinationPrefix":  "{{ .CalicoConfig.ServiceCIDR }}",
-        "NeedEncap":  true
+        "NeedEncap":  false
       }
     }
   ]

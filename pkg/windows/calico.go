@@ -125,6 +125,7 @@ func (c *Calico) Start(ctx context.Context, config *CNIConfig) error {
 		break
 	}
 	go startFelix(ctx, config.CalicoConfig)
+	go startConfd(ctx, config.CalicoConfig)
 
 	return nil
 }
@@ -164,12 +165,12 @@ func getDefaultConfig(config *CNIConfig, dataDir string, nodeConfig *config.Node
 		Hostname:              nodeConfig.AgentConfig.NodeName,
 		NodeNameFile:          filepath.Join("c:\\", dataDir, "agent", CalicoNodeNameFileName),
 		KubeNetwork:           "Calico.*",
-		Mode:                  "vxlan",
+		Mode:                  "bgp",
 		ServiceCIDR:           nodeConfig.AgentConfig.ServiceCIDR.String(),
 		DNSServers:            nodeConfig.AgentConfig.ClusterDNS.String(),
 		DNSSearch:             "svc." + nodeConfig.AgentConfig.ClusterDomain,
 		DatastoreType:         "kubernetes",
-		NetworkingBackend:     "vxlan",
+		NetworkingBackend:     "windows-bgp",
 		Platform:              platformType,
 		StartUpValidIPTimeout: 90,
 		LogDir:                "",
@@ -210,6 +211,21 @@ func startFelix(ctx context.Context, config *CalicoConfig) {
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
 		logrus.Errorf("Felix exited: %v", err)
+	}
+}
+
+func startConfd(ctx context.Context, config *CalicoConfig) {
+	args := []string{
+		"-confd",
+	}
+
+	logrus.Infof("Confd Envs: ", generateGeneralCalicoEnvs(config))
+	cmd := exec.CommandContext(ctx, "calico-node.exe", args...)
+	cmd.Env = generateGeneralCalicoEnvs(config)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		logrus.Errorf("Confd exited: %v", err)
 	}
 }
 
