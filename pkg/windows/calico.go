@@ -118,14 +118,6 @@ func (c *Calico) Setup(ctx context.Context, dataDir string, nodeConfig *daemonco
 
 // Start starts the CNI services on the Windows node.
 func (c *Calico) Start(ctx context.Context, config *CNIConfig) error {
-	for {
-		if err := startCalico(ctx, config.CalicoConfig); err != nil {
-			continue
-		}
-		break
-	}
-	go startFelix(ctx, config.CalicoConfig)
-
 	return nil
 }
 
